@@ -5,29 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HERN Wi-Fi Guest Access</title>
     <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        const baseGrantUrl = urlParams.get('base_grant_url');
-        const userContinueUrl = urlParams.get('user_continue_url') || "https://hern.sk";
+    const urlParams = new URLSearchParams(window.location.search);
+    const baseGrantUrl = urlParams.get('base_grant_url');
+    const userContinueUrl = urlParams.get('user_continue_url') || "https://hern.sk";
 
-        window.onload = function() {
-            // Nastavenie cieľovej adresy pre formuláre podľa base_grant_url
-            if (baseGrantUrl) {
-                const loginUrl = baseGrantUrl.replace("host.html", "login"); // Prevod na login endpoint
-                document.querySelectorAll('.login-form').forEach(form => {
-                    form.action = loginUrl;
-                });
-                document.querySelectorAll('.continue-input').forEach(input => {
-                    input.value = userContinueUrl;
-                });
-            }
-            switchLang('sk');
-        };
+    window.onload = function() {
+        if (base_grant_url) {
+            // Meraki posiela base_grant_url v tvare https://network-auth.com
+            // My potrebujeme poslať POST na https://network-auth.com
+            const url = new URL(baseGrantUrl);
+            const loginUrl = url.origin + "/splash/login"; 
 
-        function switchLang(lang) {
-            document.querySelectorAll('.lang-section').forEach(div => div.style.display = 'none');
-            document.getElementById('lang-' + lang).style.display = 'block';
+            document.querySelectorAll('.login-form').forEach(form => {
+                form.action = loginUrl;
+            });
+            document.querySelectorAll('.continue-input').forEach(input => {
+                input.value = userContinueUrl;
+            });
         }
-    </script>
+        switchLang('sk');
+    };
+
+    function switchLang(lang) {
+        document.querySelectorAll('.lang-section').forEach(div => div.style.display = 'none');
+        document.getElementById('lang-' + lang).style.display = 'block';
+    }
+</script>
+
     <style>
         body { font-family: 'Segoe UI', sans-serif; text-align: center; margin: 0; padding: 0; background-color: #f4f4f4; }
         .container { background: white; padding: 30px; border-radius: 12px; max-width: 350px; margin: 10vh auto; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
