@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Use - HERN s.r.o.</title>
+    <style>
+        body { font-family: sans-serif; line-height: 1.6; padding: 20px; background-color: #f4f4f4; color: #333; }
+        .container { background: white; padding: 30px; border-radius: 10px; max-width: 600px; margin: 20px auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1 { color: #b38a00; font-size: 20px; border-bottom: 2px solid #b38a00; padding-bottom: 10px; }
+        ol { padding-left: 20px; }
+        li { margin-bottom: 10px; }
+        .footer { margin-top: 20px; font-style: italic; font-weight: bold; color: #666; }
+        .back-btn { display: inline-block; margin-bottom: 20px; text-decoration: none; color: #b38a00; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-btn">← Back</a>
+        <h1>Terms of Use for 'Hern_visitors' Network</h1>
+        <ol>
+            <li><strong>Prohibition of illegal activity:</strong> Users must not use the network to download copyrighted content (torrents), distribute illegal software, or access illegal content.</li>
+            <li><strong>Limitation of liability:</strong> The provider is not responsible for data loss, personal data leaks, or device damage caused by viruses, as the device is not managed by HERN s.r.o.</li>
+            <li><strong>Time and volume restrictions:</strong> The network may be limited by the system administrator in terms of time and data volume.</li>
+            <li><strong>Prohibition of abuse:</strong> It is forbidden to congest the network with excessive data transfers that restrict other users.</li>
+            <li><strong>Security:</strong> The user acknowledges that communication is not encrypted and is responsible for securing their own device.</li>
+        </ol>
+        <p class="footer">"By connecting to the 'Hern_visitors' WiFi, you agree not to use the network for any criminal activity."</p>
+    </div>
+</body>
+</html>
