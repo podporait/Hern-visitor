@@ -5,25 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HERN Wi-Fi Guest Access</title>
     <script>
-        // Zachytenie parametrov z URL od Cisco Meraki
         const urlParams = new URLSearchParams(window.location.search);
         const baseGrantUrl = urlParams.get('base_grant_url');
         const userContinueUrl = urlParams.get('user_continue_url') || "https://hern.sk";
 
         function connect(lang) {
             if (!baseGrantUrl) {
-                // Ak stránku otvárate manuálne (nie cez Wi-Fi), vyskočí toto upozornenie
-                alert("Upozornenie: Overte, či ste pripojení na sieť Hern_visitors.");
+                alert("Upozornenie: base_grant_url chýba. Testujete mimo Meraki siete.");
                 return;
             }
-            // Presmerovanie späť na Meraki pre autorizáciu prístupu
             window.location.href = baseGrantUrl + "?continue_url=" + encodeURIComponent(userContinueUrl);
         }
 
         function switchLang(lang) {
-            // Skryť všetky jazykové sekcie
             document.querySelectorAll('.lang-section').forEach(div => div.style.display = 'none');
-            // Zobraziť vybranú sekciu
             document.getElementById('lang-' + lang).style.display = 'block';
         }
     </script>
@@ -36,105 +31,74 @@
             background-color: #f4f4f4; 
             height: 100vh;
         }
-
         .container { 
             background: white; 
             padding: 40px 30px; 
             border-radius: 12px; 
             max-width: 400px; 
-            margin: 15vh auto 0; /* Umiestnenie na obrazovke */
+            margin: 15vh auto 0; 
             box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
         }
+        .logo { max-width: 80%; height: auto; margin-bottom: 25px; }
+        
+        .flags { font-size: 30px; margin-bottom: 5px; cursor: pointer; }
+        .flags span { margin: 0 8px; transition: transform 0.2s; display: inline-block; }
+        .flags span:hover { transform: scale(1.2); }
 
-        .logo { 
-            max-width: 80%; 
-            height: auto; 
-            margin-bottom: 30px; 
-        }
-
-        .lang-nav { 
-            margin-bottom: 30px; 
-            font-size: 14px;
-            color: #888;
-        }
-
-        .lang-nav span { 
-            cursor: pointer; 
-            margin: 0 10px; 
-            color: #b38a00; 
-            font-weight: bold;
-            text-decoration: underline;
-        }
-
-        .lang-nav span:hover {
-            color: #8c6c00;
-        }
-
-        .lang-section { 
-            display: none; 
-        }
-
-        h1 { 
-            font-size: 20px; 
-            color: #333; 
-            margin-bottom: 15px; 
-        }
-
-        p { 
-            color: #666; 
-            font-size: 14px; 
-            line-height: 1.5;
-            margin-bottom: 25px;
-        }
-
+        .lang-nav { margin-bottom: 25px; font-size: 14px; color: #888; }
+        .lang-nav span { cursor: pointer; margin: 0 5px; color: #b38a00; font-weight: bold; }
+        
+        .lang-section { display: none; }
+        h1 { font-size: 20px; color: #333; margin-bottom: 15px; }
+        p { color: #666; font-size: 14px; line-height: 1.5; margin-bottom: 25px; }
+        
+        /* Štýl pre odkaz na podmienky */
+        .terms-link { color: #b38a00; text-decoration: underline; cursor: pointer; }
+        
         button { 
-            background-color: #b38a00; 
-            color: white; 
-            border: none; 
-            padding: 15px 30px; 
-            font-size: 18px; 
-            font-weight: bold;
-            cursor: pointer; 
-            border-radius: 6px; 
-            width: 100%; 
-            transition: background 0.3s;
+            background-color: #b38a00; color: white; border: none; padding: 15px 30px; 
+            font-size: 18px; font-weight: bold; cursor: pointer; border-radius: 6px; 
+            width: 100%; transition: background 0.3s;
         }
-
-        button:hover { 
-            background-color: #8c6c00; 
-        }
+        button:hover { background-color: #8c6c00; }
     </style>
 </head>
         
 <body onload="switchLang('sk')">
     <div class="container">
-        <!-- Logo spoločnosti - uistite sa, že súbor je na GitHube v rovnakom priečinku -->
         <img src="Hern_zlata_with%20steel.png" alt="HERN Logo" class="logo">
         
+        <!-- Vlajky nad jazykmi -->
+        <div class="flags">
+            <span onclick="switchLang('sk')" title="Slovenčina">🇸🇰</span>
+            <span onclick="switchLang('en')" title="English">🇬🇧</span>
+            <span onclick="switchLang('de')" title="Deutsch">🇩🇪</span>
+        </div>
+
         <div class="lang-nav">
             <span onclick="switchLang('sk')">SK</span> | 
             <span onclick="switchLang('en')">EN</span> | 
             <span onclick="switchLang('de')">DE</span>
         </div>
 
-        <!-- Slovenská verzia -->
+        <!-- SK -->
         <div id="lang-sk" class="lang-section" style="display:block;">
             <h1>Vitajte v HERN s.r.o.</h1>
-            <p>Kliknutím na tlačidlo súhlasíte s podmienkami používania hosťovskej Wi-Fi siete.</p>
+            <p>Kliknutím na tlačidlo súhlasíte s <a href="URL_NA_TVOJE_PODMIENKY" target="_blank" class="terms-link">podmienkami</a> používania hosťovskej Wi-Fi siete.</p>
             <button onclick="connect('sk')">Pripojiť sa</button>
         </div>
 
-        <!-- Anglická verzia -->
+        <!-- EN -->
         <div id="lang-en" class="lang-section">
             <h1>Welcome to HERN s.r.o.</h1>
-            <p>By clicking the button you agree to the terms and conditions of the guest Wi-Fi network.</p>
+            <p>By clicking the button you agree to the <a href="URL_NA_TVOJE_PODMIENKY" target="_blank" class="terms-link">terms and conditions</a> of the guest Wi-Fi network.</p>
             <button onclick="connect('en')">Connect</button>
         </div>
 
-        <!-- Nemecká verzia -->
+        <!-- DE -->
         <div id="lang-de" class="lang-section">
             <h1>Willkommen bei HERN s.r.o.</h1>
-            <p>Mit dem Klick auf die Schaltfläche akzeptieren Sie die Nutzungsbedingungen des Gast-Wi-Fi-Netzwerks.</p>
+            <p>Mit dem Klick na tlačidlo akzeptieren Sie die <a href="URL_NA_TVOJE_PODMIENKY" target="_blank" class="terms-link">Nutzungsbedingungen</a> des Gast-Wi-Fi-Netzwerks.</p>
             <button onclick="connect('de')">Verbinden</button>
         </div>
     </div>
