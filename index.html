@@ -10,18 +10,25 @@
     const userContinueUrl = urlParams.get('user_continue_url') || "https://hern.sk";
 
     window.onload = function() {
-        if (base_grant_url) {
-            // Meraki posiela base_grant_url v tvare https://network-auth.com
-            // My potrebujeme poslať POST na https://network-auth.com
-            const url = new URL(baseGrantUrl);
-            const loginUrl = url.origin + "/splash/login"; 
+        // OPRAVA: Premenná musí byť baseGrantUrl (bez podčiarkovníkov)
+        if (baseGrantUrl) {
+            try {
+                const url = new URL(baseGrantUrl);
+                const loginUrl = url.origin + "/splash/login"; 
+                
+                console.log("Cieľová URL pre prihlásenie: " + loginUrl);
 
-            document.querySelectorAll('.login-form').forEach(form => {
-                form.action = loginUrl;
-            });
-            document.querySelectorAll('.continue-input').forEach(input => {
-                input.value = userContinueUrl;
-            });
+                document.querySelectorAll('.login-form').forEach(form => {
+                    form.action = loginUrl;
+                });
+                document.querySelectorAll('.continue-input').forEach(input => {
+                    input.value = userContinueUrl;
+                });
+            } catch (e) {
+                console.error("Chyba pri spracovaní base_grant_url", e);
+            }
+        } else {
+            console.warn("base_grant_url nebol nájdený v adrese.");
         }
         switchLang('sk');
     };
@@ -31,6 +38,7 @@
         document.getElementById('lang-' + lang).style.display = 'block';
     }
 </script>
+
 
     <style>
         body { font-family: 'Segoe UI', sans-serif; text-align: center; margin: 0; padding: 0; background-color: #f4f4f4; }
