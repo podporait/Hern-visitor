@@ -5,51 +5,65 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HERN Wi-Fi Guest Access</title>
     <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const baseGrantUrl = urlParams.get('base_grant_url');
-    const userContinueUrl = urlParams.get('user_continue_url') || "https://hern.sk";
+        const urlParams = new URLSearchParams(window.location.search);
+        const baseGrantUrl = urlParams.get('base_grant_url');
+        const userContinueUrl = urlParams.get('user_continue_url') || "https://hern.sk";
 
-    window.onload = function() {
-        // OPRAVA: Premenná musí byť baseGrantUrl (bez podčiarkovníkov)
-        if (baseGrantUrl) {
-            try {
-                const url = new URL(baseGrantUrl);
-                const loginUrl = url.origin + "/splash/login"; 
-                
-                console.log("Cieľová URL pre prihlásenie: " + loginUrl);
+        window.onload = function() {
+            const forms = document.querySelectorAll('.login-form');
 
-                document.querySelectorAll('.login-form').forEach(form => {
-                    form.action = loginUrl;
+            // Kontrola, či sme v reálnej Meraki sieti (prítomnosť base_grant_url)
+            if (baseGrantUrl) {
+                try {
+                    const url = new URL(baseGrantUrl);
+                    const loginUrl = url.origin + "/splash/login"; 
+                    
+                    console.log("Cieľová URL pre prihlásenie nastavená na: " + loginUrl);
+
+                    forms.forEach(form => {
+                        form.action = loginUrl;
+                    });
+                    document.querySelectorAll('.continue-input').forEach(input => {
+                        input.value = userContinueUrl;
+                    });
+                } catch (e) {
+                    console.error("Chyba pri spracovaní base_grant_url", e);
+                }
+            } else {
+                // Poistka proti chybe 405 (GitHub nepodporuje POST mimo Meraki siete)
+                forms.forEach(form => {
+                    form.onsubmit = function(e) {
+                        e.preventDefault();
+                        alert("Upozornenie: Nie ste pripojený cez Meraki Wi-Fi. Prihlásenie v simulovanom režime nie je možné.");
+                        return false;
+                    };
                 });
-                document.querySelectorAll('.continue-input').forEach(input => {
-                    input.value = userContinueUrl;
-                });
-            } catch (e) {
-                console.error("Chyba pri spracovaní base_grant_url", e);
+                console.warn("base_grant_url nebol nájdený. Odosielanie formulárov je zablokované (prevencia chyby 405).");
             }
-        } else {
-            console.warn("base_grant_url nebol nájdený v adrese.");
+            switchLang('sk');
+        };
+
+        function switchLang(lang) {
+            document.querySelectorAll('.lang-section').forEach(div => div.style.display = 'none');
+            document.getElementById('lang-' + lang).style.display = 'block';
         }
-        switchLang('sk');
-    };
-
-    function switchLang(lang) {
-        document.querySelectorAll('.lang-section').forEach(div => div.style.display = 'none');
-        document.getElementById('lang-' + lang).style.display = 'block';
-    }
-</script>
-
-
+    </script>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; text-align: center; margin: 0; padding: 0; background-color: #f4f4f4; }
-        .container { background: white; padding: 30px; border-radius: 12px; max-width: 350px; margin: 10vh auto; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        .logo { max-width: 70%; margin-bottom: 20px; }
-        .flags { font-size: 24px; margin-bottom: 10px; cursor: pointer; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; margin: 0; padding: 0; background-color: #f4f4f4; height: 100vh; }
+        .container { background: white; padding: 30px; border-radius: 12px; max-width: 350px; margin: 10vh auto 0; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .logo { max-width: 70%; height: auto; margin-bottom: 20px; }
+        .flags { font-size: 30px; margin-bottom: 5px; cursor: pointer; }
+        .flags span { margin: 0 8px; transition: transform 0.2s; display: inline-block; }
+        .flags span:hover { transform: scale(1.2); }
+        .lang-nav { margin-bottom: 20px; font-size: 14px; color: #888; }
+        .lang-nav span { cursor: pointer; margin: 0 5px; color: #b38a00; font-weight: bold; }
         .lang-section { display: none; }
+        h1 { font-size: 20px; color: #333; margin-bottom: 15px; }
         input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
-        button { background-color: #b38a00; color: white; border: none; padding: 15px; font-size: 16px; font-weight: bold; cursor: pointer; border-radius: 6px; width: 100%; margin-top: 10px; }
-        .terms-link { color: #b38a00; text-decoration: underline; font-size: 12px; }
-        p { font-size: 13px; color: #666; }
+        button { background-color: #b38a00; color: white; border: none; padding: 15px; font-size: 18px; font-weight: bold; cursor: pointer; border-radius: 6px; width: 100%; margin-top: 15px; transition: background 0.3s; }
+        button:hover { background-color: #8c6c00; }
+        .terms-link { color: #b38a00; text-decoration: underline; font-size: 12px; cursor: pointer; }
+        p { font-size: 13px; color: #666; line-height: 1.4; }
     </style>
 </head>
 <body>
@@ -62,6 +76,12 @@
             <span onclick="switchLang('de')">🇩🇪</span>
         </div>
 
+        <div class="lang-nav">
+            <span onclick="switchLang('sk')">SK</span> | 
+            <span onclick="switchLang('en')">EN</span> | 
+            <span onclick="switchLang('de')">DE</span>
+        </div>
+
         <!-- SK Sekcia -->
         <div id="lang-sk" class="lang-section">
             <h1>Prihlásenie</h1>
@@ -69,7 +89,7 @@
                 <input type="hidden" name="continue_url" class="continue-input">
                 <input type="email" name="username" placeholder="E-mail (Meraki účet)" required>
                 <input type="password" name="password" placeholder="Heslo" required>
-                <p>Súhlasím s <a href="podmienky.html" target="_blank" class="terms-link">podmienkami</a>.</p>
+                <p>Súhlasím s <a href="podmienky.html" target="_blank" class="terms-link">podmienkami</a> používania siete.</p>
                 <button type="submit">Prihlásiť sa</button>
             </form>
         </div>
@@ -81,7 +101,7 @@
                 <input type="hidden" name="continue_url" class="continue-input">
                 <input type="email" name="username" placeholder="Email" required>
                 <input type="password" name="password" placeholder="Password" required>
-                <p>I agree to the <a href="podmienky_en.html" target="_blank" class="terms-link">terms</a>.</p>
+                <p>I agree to the <a href="podmienky_en.html" target="_blank" class="terms-link">terms and conditions</a>.</p>
                 <button type="submit">Login</button>
             </form>
         </div>
@@ -93,7 +113,7 @@
                 <input type="hidden" name="continue_url" class="continue-input">
                 <input type="email" name="username" placeholder="E-Mail" required>
                 <input type="password" name="password" placeholder="Passwort" required>
-                <p>Ich stimme den <a href="podmienky_de.html" target="_blank" class="terms-link">Bedingungen</a> zu.</p>
+                <p>Ich stimme den <a href="podmienky_de.html" target="_blank" class="terms-link">Nutzungsbedingungen</a> zu.</p>
                 <button type="submit">Anmelden</button>
             </form>
         </div>
