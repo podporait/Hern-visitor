@@ -84,9 +84,17 @@
         <!-- SK -->
         <div id="lang-sk" class="lang-section" style="display:block;">
             <h1>Vitajte v HERN s.r.o.</h1>
-            <p>Kliknutím na tlačidlo súhlasíte s <a href="podmienky.html" target="_blank" class="terms-link">podmienkami</a> používania hosťovskej Wi-Fi siete.</p>
-            <button onclick="connect('sk')">Pripojiť sa</button>
-        </div>
+           <form action="https://network-auth.com" method="POST">
+        <!-- Meraki potrebuje tieto skryté polia, aby vedelo, kam sa vrátiť -->
+        <input type="hidden" name="continue_url" id="cont_sk">
+        
+        <input type="text" name="username" placeholder="Meno" required style="margin-bottom:10px; padding:10px; width:80%;"><br>
+        <input type="password" name="password" placeholder="Heslo" required style="margin-bottom:10px; padding:10px; width:80%;"><br>
+        
+        <p>Kliknutím na tlačidlo súhlasíte s <a href="podmienky.html" target="_blank" class="terms-link">podmienkami</a>.</p>
+        <button type="submit">Prihlásiť sa</button>
+    </form>
+</div>
 
         <!-- EN -->
         <div id="lang-en" class="lang-section">
