@@ -9,37 +9,34 @@
         const baseGrantUrl = urlParams.get('base_grant_url');
         const userContinueUrl = urlParams.get('user_continue_url') || "https://hern.sk";
 
-              window.onload = function() {
-            const forms = document.querySelectorAll('.login-form');
-            const regLinks = document.querySelectorAll('.self-reg-link');
+        window.onload = function() {
+            // --- NASTAVENIE PRE TVOJ UZOL n100 ---
+            const node = "n100"; 
             let loginUrl, selfRegUrl;
 
             if (baseGrantUrl) {
-                // IDEÁLNY STAV: Meraki dodalo parametre
                 try {
                     const url = new URL(baseGrantUrl);
                     loginUrl = url.origin + "/splash/login"; 
                     selfRegUrl = url.origin + "/splash/selfreg?base_grant_url=" + encodeURIComponent(baseGrantUrl);
                 } catch (e) { console.error(e); }
             } else {
-                // UNIVERZÁLNY FALLBACK: Funguje bez ohľadu na n-číslo
-                loginUrl = "https://n-auth.com";
-                selfRegUrl = "https://n-auth.com";
+                // FORCE FALLBACK pre n100: ak Meraki parametre nepošle, vynútime túto cestu
+                loginUrl = "https://" + node + "://";
+                selfRegUrl = "https://" + node + "://";
                 
-                forms.forEach(form => { form.onsubmit = null; });
-                regLinks.forEach(link => { link.onclick = null; });
+                // Odomknutie formulárov (zrušenie simulovanej poistky)
+                document.querySelectorAll('.login-form').forEach(form => { form.onsubmit = null; });
+                document.querySelectorAll('.self-reg-link').forEach(link => { link.onclick = null; });
             }
 
-            forms.forEach(form => { form.action = loginUrl; });
-            regLinks.forEach(link => { link.href = selfRegUrl; });
-            
-            document.querySelectorAll('.continue-input').forEach(input => {
-                input.value = userContinueUrl;
-            });
+            // Aplikovanie adries na formuláre a linky
+            document.querySelectorAll('.login-form').forEach(form => { form.action = loginUrl; });
+            document.querySelectorAll('.self-reg-link').forEach(link => { link.href = selfRegUrl; });
+            document.querySelectorAll('.continue-input').forEach(input => { input.value = userContinueUrl; });
 
             switchLang('sk');
         };
-
 
         function switchLang(lang) {
             document.querySelectorAll('.lang-section').forEach(div => div.style.display = 'none');
@@ -55,11 +52,11 @@
         .lang-nav { margin-bottom: 25px; font-size: 14px; color: #888; }
         .lang-nav span { cursor: pointer; margin: 0 5px; color: #b38a00; font-weight: bold; }
         .lang-section { display: none; }
-        h1 { font-size: 22px; color: #333; margin-bottom: 15px; }
+        h1 { font-size: 20px; color: #333; margin-bottom: 15px; }
         input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
         button { background-color: #b38a00; color: white; border: none; padding: 15px; font-size: 18px; font-weight: bold; cursor: pointer; border-radius: 6px; width: 100%; margin-top: 15px; }
         .terms-link, .self-reg-link { color: #b38a00; text-decoration: underline; font-weight: bold; cursor: pointer; }
-        p { font-size: 14px; color: #666; line-height: 1.5; }
+        p { font-size: 13px; color: #666; line-height: 1.5; }
         .reg-box { margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee; }
     </style>
 </head>
