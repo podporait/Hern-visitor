@@ -29,20 +29,20 @@
                 } catch (e) {
                     console.error("Chyba pri spracovaní base_grant_url", e);
                 }
-            } else {
-                // Fallback stav (tvoj prípad), kedy parametre v URL chýbajú
-                const fallbackLogin = "https://" + node + "://";
-                const fallbackReg = "https://" + node + "://";
+                      } else {
+                // UNIVERZÁLNE FALLBACK ADRESY (fungujú pre všetky uzly)
+                const fallbackLogin = "https://n-auth.com";
+                const fallbackReg = "https://n-auth.com";
 
                 forms.forEach(form => {
-                    form.action = fallbackLogin;
-                    form.onsubmit = null; // Odomknutie formulára
+                    form.action = fallbackLogin; // Nastaví presnú cestu k prihláseniu
+                    form.onsubmit = null; 
                 });
                 regLinks.forEach(link => {
-                    link.href = fallbackReg;
-                    link.onclick = null; // Odomknutie registrácie
+                    link.href = fallbackReg; // Nastaví presnú cestu k registrácii
+                    link.onclick = null; 
                 });
-                console.log("Používam fallback uzol: " + node);
+                console.log("Používam univerzálne Meraki rozhranie n-auth.com");
             }
 
             // Nastavenie cieľovej URL pre všetky formuláre
