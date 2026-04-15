@@ -10,54 +10,46 @@
         const userContinueUrl = urlParams.get('user_continue_url') || "https://hern.sk";
 
         window.onload = function() {
+            // --- TU UPRAV SVOJE N-ČÍSLO (uzol) ---
+            const node = "n100"; 
+            // ------------------------------------
+
             const forms = document.querySelectorAll('.login-form');
             const regLinks = document.querySelectorAll('.self-reg-link');
 
             if (baseGrantUrl) {
+                // Stav, kedy Meraki posiela parametre v URL
                 try {
                     const url = new URL(baseGrantUrl);
                     const loginUrl = url.origin + "/splash/login"; 
-                    // Generujeme odkaz na registráciu v Meraki Cloude
                     const selfRegUrl = url.origin + "/splash/selfreg?base_grant_url=" + encodeURIComponent(baseGrantUrl);
                     
-                    console.log("Meraki detegované. Login URL: " + loginUrl);
-
-                    // Nastavenie formulárov
-                    forms.forEach(form => {
-                        form.action = loginUrl;
-                    });
-
-                    // Nastavenie cieľovej stránky po úspešnom prihlásení
-                    document.querySelectorAll('.continue-input').forEach(input => {
-                        input.value = userContinueUrl;
-                    });
-
-                    // Nastavenie odkazov na registráciu
-                    regLinks.forEach(link => {
-                        link.href = selfRegUrl;
-                    });
-
+                    forms.forEach(form => { form.action = loginUrl; });
+                    regLinks.forEach(link => { link.href = selfRegUrl; });
                 } catch (e) {
                     console.error("Chyba pri spracovaní base_grant_url", e);
                 }
             } else {
-                // Poistka pre testovanie mimo Wi-Fi (prevencia chyby 405)
+                // Fallback stav (tvoj prípad), kedy parametre v URL chýbajú
+                const fallbackLogin = "https://" + node + "://";
+                const fallbackReg = "https://" + node + "://";
+
                 forms.forEach(form => {
-                    form.onsubmit = function(e) {
-                        e.preventDefault();
-                        alert("Upozornenie: Nie ste pripojený cez Meraki Wi-Fi. Prihlásenie v simulovanom režime nie je možné.");
-                    };
+                    form.action = fallbackLogin;
+                    form.onsubmit = null; // Odomknutie formulára
                 });
-                
                 regLinks.forEach(link => {
-                    link.onclick = function(e) {
-                        if (!this.href || this.href.includes('#')) {
-                            e.preventDefault();
-                            alert("Registrácia je dostupná len pri reálnom pripojení cez Meraki Wi-Fi.");
-                        }
-                    };
+                    link.href = fallbackReg;
+                    link.onclick = null; // Odomknutie registrácie
                 });
+                console.log("Používam fallback uzol: " + node);
             }
+
+            // Nastavenie cieľovej URL pre všetky formuláre
+            document.querySelectorAll('.continue-input').forEach(input => {
+                input.value = userContinueUrl;
+            });
+            
             switchLang('sk');
         };
 
@@ -67,7 +59,7 @@
         }
     </script>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; text-align: center; margin: 0; padding: 0; background-color: #f4f4f4; height: 100vh; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; margin: 0; padding: 0; background-color: #f4f4f4; height: 100vh; }
         .container { background: white; padding: 35px 25px; border-radius: 12px; max-width: 350px; margin: 10vh auto; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
         .logo { max-width: 75%; height: auto; margin-bottom: 25px; }
         .flags { font-size: 32px; margin-bottom: 5px; cursor: pointer; }
@@ -101,7 +93,7 @@
             <span onclick="switchLang('de')">DE</span>
         </div>
 
-        <!-- SK Mutácia -->
+        <!-- SK Sekcia -->
         <div id="lang-sk" class="lang-section">
             <h1>Prihlásenie</h1>
             <form class="login-form" method="POST">
@@ -116,7 +108,7 @@
             </form>
         </div>
 
-        <!-- EN Mutácia -->
+        <!-- EN Sekcia -->
         <div id="lang-en" class="lang-section">
             <h1>Login</h1>
             <form class="login-form" method="POST">
@@ -131,7 +123,7 @@
             </form>
         </div>
 
-        <!-- DE Mutácia -->
+        <!-- DE Sekcia -->
         <div id="lang-de" class="lang-section">
             <h1>Anmeldung</h1>
             <form class="login-form" method="POST">
