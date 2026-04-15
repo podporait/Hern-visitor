@@ -10,22 +10,27 @@
         const userContinueUrl = urlParams.get('user_continue_url') || "https://hern.sk";
 
         window.onload = function() {
-                    
             const forms = document.querySelectorAll('.login-form');
 
-    link.href = selfRegUrl;
-                        
-            // Kontrola, či sme v reálnej Meraki sieti (prítomnosť base_grant_url)
+            // Kontrola, či sme v reálnej Meraki sieti
             if (baseGrantUrl) {
                 try {
                     const url = new URL(baseGrantUrl);
                     const loginUrl = url.origin + "/splash/login"; 
+                    // VYGENEROVANIE ADRESY PRE REGISTRÁCIU
+                    const selfRegUrl = url.origin + "/splash/selfreg?base_grant_url=" + encodeURIComponent(baseGrantUrl);
                     
-                    console.log("Cieľová URL pre prihlásenie nastavená na: " + loginUrl);
+                    console.log("Cieľová URL pre prihlásenie: " + loginUrl);
 
                     forms.forEach(form => {
                         form.action = loginUrl;
                     });
+
+                    // PRIRADENIE ADRESY VŠETKÝM REGISTRAČNÝM ODKAZOM
+                    document.querySelectorAll('.self-reg-link').forEach(link => {
+                        link.href = selfRegUrl;
+                    });
+
                     document.querySelectorAll('.continue-input').forEach(input => {
                         input.value = userContinueUrl;
                     });
@@ -33,7 +38,6 @@
                     console.error("Chyba pri spracovaní base_grant_url", e);
                 }
             } else {
-                // Poistka proti chybe 405 (GitHub nepodporuje POST mimo Meraki siete)
                 forms.forEach(form => {
                     form.onsubmit = function(e) {
                         e.preventDefault();
@@ -41,7 +45,6 @@
                         return false;
                     };
                 });
-                console.warn("base_grant_url nebol nájdený. Odosielanie formulárov je zablokované (prevencia chyby 405).");
             }
             switchLang('sk');
         };
@@ -57,7 +60,6 @@
         .logo { max-width: 70%; height: auto; margin-bottom: 20px; }
         .flags { font-size: 30px; margin-bottom: 5px; cursor: pointer; }
         .flags span { margin: 0 8px; transition: transform 0.2s; display: inline-block; }
-        .flags span:hover { transform: scale(1.2); }
         .lang-nav { margin-bottom: 20px; font-size: 14px; color: #888; }
         .lang-nav span { cursor: pointer; margin: 0 5px; color: #b38a00; font-weight: bold; }
         .lang-section { display: none; }
@@ -65,7 +67,7 @@
         input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
         button { background-color: #b38a00; color: white; border: none; padding: 15px; font-size: 18px; font-weight: bold; cursor: pointer; border-radius: 6px; width: 100%; margin-top: 15px; transition: background 0.3s; }
         button:hover { background-color: #8c6c00; }
-        .terms-link { color: #b38a00; text-decoration: underline; font-size: 12px; cursor: pointer; }
+        .terms-link, .self-reg-link { color: #b38a00; text-decoration: underline; font-size: 12px; cursor: pointer; }
         p { font-size: 13px; color: #666; line-height: 1.4; }
     </style>
 </head>
@@ -85,20 +87,18 @@
             <span onclick="switchLang('de')">DE</span>
         </div>
 
-        <!-- SK Sekcia -->
         <div id="lang-sk" class="lang-section">
             <h1>Prihlásenie</h1>
             <form class="login-form" method="POST">
                 <input type="hidden" name="continue_url" class="continue-input">
-                <input type="email" name="username" placeholder="E-mail (Meraki účet)" required>
+                <input type="email" name="username" placeholder="E-mail" required>
                 <input type="password" name="password" placeholder="Heslo" required>
                 <p>Súhlasím s <a href="podmienky.html" target="_blank" class="terms-link">podmienkami</a> používania siete.</p>
                 <button type="submit">Prihlásiť sa</button>
-                <p>Nemáte účet? <a href="#" class="self-reg-link" style="color: #b38a00; font-weight: bold;">Zaregistrujte sa tu</a></p>
+                <p style="margin-top: 15px;">Nemáte účet? <a href="#" class="self-reg-link" style="font-weight: bold;">Zaregistrujte sa tu</a></p>
             </form>
         </div>
 
-        <!-- EN Sekcia -->
         <div id="lang-en" class="lang-section">
             <h1>Login</h1>
             <form class="login-form" method="POST">
@@ -107,11 +107,10 @@
                 <input type="password" name="password" placeholder="Password" required>
                 <p>I agree to the <a href="podmienky_en.html" target="_blank" class="terms-link">terms and conditions</a>.</p>
                 <button type="submit">Login</button>
-                <p>Don't have an account? <a href="#" class="self-reg-link" style="color: #b38a00; font-weight: bold;">Register here</a></p>
+                <p style="margin-top: 15px;">Don't have an account? <a href="#" class="self-reg-link" style="font-weight: bold;">Register here</a></p>
             </form>
         </div>
 
-        <!-- DE Sekcia -->
         <div id="lang-de" class="lang-section">
             <h1>Anmeldung</h1>
             <form class="login-form" method="POST">
@@ -120,7 +119,7 @@
                 <input type="password" name="password" placeholder="Passwort" required>
                 <p>Ich stimme den <a href="podmienky_de.html" target="_blank" class="terms-link">Nutzungsbedingungen</a> zu.</p>
                 <button type="submit">Anmelden</button>
-                <p>Haben Sie noch kein Konto? <a href="#" class="self-reg-link" style="color: #b38a00; font-weight: bold;">Hier registrieren</a></p>
+                <p style="margin-top: 15px;">Haben Sie noch kein Konto? <a href="#" class="self-reg-link" style="font-weight: bold;">Hier registrieren</a></p>
             </form>
         </div>
     </div>
