@@ -9,42 +9,37 @@
         const baseGrantUrl = urlParams.get('base_grant_url');
         const userContinueUrl = urlParams.get('user_continue_url') || "https://hern.sk";
 
-        window.onload = function() {
+              window.onload = function() {
             const forms = document.querySelectorAll('.login-form');
             const regLinks = document.querySelectorAll('.self-reg-link');
-
-            // --- NASTAVENIE PRE TVOJ UZOL n100 ---
-            const node = "n100"; 
             let loginUrl, selfRegUrl;
 
             if (baseGrantUrl) {
-                // Ak Meraki posiela parametre (ideálny stav)
+                // IDEÁLNY STAV: Meraki dodalo parametre
                 try {
                     const url = new URL(baseGrantUrl);
                     loginUrl = url.origin + "/splash/login"; 
                     selfRegUrl = url.origin + "/splash/selfreg?base_grant_url=" + encodeURIComponent(baseGrantUrl);
-                } catch (e) {
-                    console.error("Chyba v URL", e);
-                }
+                } catch (e) { console.error(e); }
             } else {
-                // Fallback pre n100 (tvoj prípad)
-                loginUrl = "https://" + node + "://";
-                selfRegUrl = "https://" + node + "://";
+                // UNIVERZÁLNY FALLBACK: Funguje bez ohľadu na n-číslo
+                loginUrl = "https://n-auth.com";
+                selfRegUrl = "https://n-auth.com";
                 
-                // Odomknutie formulárov (zrušenie simulovanej poistky)
                 forms.forEach(form => { form.onsubmit = null; });
                 regLinks.forEach(link => { link.onclick = null; });
             }
 
-            // Aplikovanie adries na prvky
             forms.forEach(form => { form.action = loginUrl; });
             regLinks.forEach(link => { link.href = selfRegUrl; });
+            
             document.querySelectorAll('.continue-input').forEach(input => {
                 input.value = userContinueUrl;
             });
 
             switchLang('sk');
         };
+
 
         function switchLang(lang) {
             document.querySelectorAll('.lang-section').forEach(div => div.style.display = 'none');
