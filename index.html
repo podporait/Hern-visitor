@@ -10,8 +10,11 @@
         const userContinueUrl = urlParams.get('user_continue_url') || "https://hern.sk";
 
         window.onload = function() {
+                    
             const forms = document.querySelectorAll('.login-form');
 
+    link.href = selfRegUrl;
+                        
             // Kontrola, či sme v reálnej Meraki sieti (prítomnosť base_grant_url)
             if (baseGrantUrl) {
                 try {
