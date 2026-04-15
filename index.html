@@ -10,46 +10,39 @@
         const userContinueUrl = urlParams.get('user_continue_url') || "https://hern.sk";
 
         window.onload = function() {
-            // --- TU UPRAV SVOJE N-ČÍSLO (uzol) ---
-            const node = "n100"; 
-            // ------------------------------------
-
             const forms = document.querySelectorAll('.login-form');
             const regLinks = document.querySelectorAll('.self-reg-link');
 
+            // --- NASTAVENIE PRE TVOJ UZOL n100 ---
+            const node = "n100"; 
+            let loginUrl, selfRegUrl;
+
             if (baseGrantUrl) {
-                // Stav, kedy Meraki posiela parametre v URL
+                // Ak Meraki posiela parametre (ideálny stav)
                 try {
                     const url = new URL(baseGrantUrl);
-                    const loginUrl = url.origin + "/splash/login"; 
-                    const selfRegUrl = url.origin + "/splash/selfreg?base_grant_url=" + encodeURIComponent(baseGrantUrl);
-                    
-                    forms.forEach(form => { form.action = loginUrl; });
-                    regLinks.forEach(link => { link.href = selfRegUrl; });
+                    loginUrl = url.origin + "/splash/login"; 
+                    selfRegUrl = url.origin + "/splash/selfreg?base_grant_url=" + encodeURIComponent(baseGrantUrl);
                 } catch (e) {
-                    console.error("Chyba pri spracovaní base_grant_url", e);
+                    console.error("Chyba v URL", e);
                 }
-                      } else {
-                // UNIVERZÁLNE FALLBACK ADRESY (fungujú pre všetky uzly)
-                const fallbackLogin = "https://n-auth.com";
-                const fallbackReg = "https://n-auth.com";
-
-                forms.forEach(form => {
-                    form.action = fallbackLogin; // Nastaví presnú cestu k prihláseniu
-                    form.onsubmit = null; 
-                });
-                regLinks.forEach(link => {
-                    link.href = fallbackReg; // Nastaví presnú cestu k registrácii
-                    link.onclick = null; 
-                });
-                console.log("Používam univerzálne Meraki rozhranie n-auth.com");
+            } else {
+                // Fallback pre n100 (tvoj prípad)
+                loginUrl = "https://" + node + "://";
+                selfRegUrl = "https://" + node + "://";
+                
+                // Odomknutie formulárov (zrušenie simulovanej poistky)
+                forms.forEach(form => { form.onsubmit = null; });
+                regLinks.forEach(link => { link.onclick = null; });
             }
 
-            // Nastavenie cieľovej URL pre všetky formuláre
+            // Aplikovanie adries na prvky
+            forms.forEach(form => { form.action = loginUrl; });
+            regLinks.forEach(link => { link.href = selfRegUrl; });
             document.querySelectorAll('.continue-input').forEach(input => {
                 input.value = userContinueUrl;
             });
-            
+
             switchLang('sk');
         };
 
@@ -59,19 +52,17 @@
         }
     </script>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; margin: 0; padding: 0; background-color: #f4f4f4; height: 100vh; }
+        body { font-family: 'Segoe UI', sans-serif; text-align: center; margin: 0; padding: 0; background-color: #f4f4f4; height: 100vh; }
         .container { background: white; padding: 35px 25px; border-radius: 12px; max-width: 350px; margin: 10vh auto; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
         .logo { max-width: 75%; height: auto; margin-bottom: 25px; }
         .flags { font-size: 32px; margin-bottom: 5px; cursor: pointer; }
         .flags span { margin: 0 10px; transition: transform 0.2s; display: inline-block; }
-        .flags span:hover { transform: scale(1.2); }
         .lang-nav { margin-bottom: 25px; font-size: 14px; color: #888; }
         .lang-nav span { cursor: pointer; margin: 0 5px; color: #b38a00; font-weight: bold; }
         .lang-section { display: none; }
         h1 { font-size: 22px; color: #333; margin-bottom: 15px; }
         input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
-        button { background-color: #b38a00; color: white; border: none; padding: 15px; font-size: 18px; font-weight: bold; cursor: pointer; border-radius: 6px; width: 100%; margin-top: 15px; transition: 0.3s; }
-        button:hover { background-color: #8c6c00; }
+        button { background-color: #b38a00; color: white; border: none; padding: 15px; font-size: 18px; font-weight: bold; cursor: pointer; border-radius: 6px; width: 100%; margin-top: 15px; }
         .terms-link, .self-reg-link { color: #b38a00; text-decoration: underline; font-weight: bold; cursor: pointer; }
         p { font-size: 14px; color: #666; line-height: 1.5; }
         .reg-box { margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee; }
@@ -80,61 +71,48 @@
 <body>
     <div class="container">
         <img src="Hern_zlata_with%20steel.png" alt="HERN Logo" class="logo">
-        
         <div class="flags">
             <span onclick="switchLang('sk')">🇸🇰</span>
             <span onclick="switchLang('en')">🇬🇧</span>
             <span onclick="switchLang('de')">🇩🇪</span>
         </div>
-
         <div class="lang-nav">
-            <span onclick="switchLang('sk')">SK</span> | 
-            <span onclick="switchLang('en')">EN</span> | 
-            <span onclick="switchLang('de')">DE</span>
+            <span onclick="switchLang('sk')">SK</span> | <span onclick="switchLang('en')">EN</span> | <span onclick="switchLang('de')">DE</span>
         </div>
 
-        <!-- SK Sekcia -->
         <div id="lang-sk" class="lang-section">
             <h1>Prihlásenie</h1>
             <form class="login-form" method="POST">
                 <input type="hidden" name="continue_url" class="continue-input">
                 <input type="email" name="username" placeholder="E-mail" required>
                 <input type="password" name="password" placeholder="Heslo" required>
-                <p>Súhlasím s <a href="podmienky.html" target="_blank" class="terms-link">podmienkami</a> používania siete.</p>
+                <p>Súhlasím s <a href="podmienky.html" target="_blank" class="terms-link">podmienkami</a>.</p>
                 <button type="submit">Prihlásiť sa</button>
-                <div class="reg-box">
-                    <p>Nemáte účet? <a href="#" class="self-reg-link">Zaregistrujte sa tu</a></p>
-                </div>
+                <div class="reg-box"><p>Nemáte účet? <a href="#" class="self-reg-link">Zaregistrujte sa tu</a></p></div>
             </form>
         </div>
 
-        <!-- EN Sekcia -->
         <div id="lang-en" class="lang-section">
             <h1>Login</h1>
             <form class="login-form" method="POST">
                 <input type="hidden" name="continue_url" class="continue-input">
                 <input type="email" name="username" placeholder="Email" required>
                 <input type="password" name="password" placeholder="Password" required>
-                <p>I agree to the <a href="podmienky_en.html" target="_blank" class="terms-link">terms and conditions</a>.</p>
+                <p>I agree to the <a href="podmienky_en.html" target="_blank" class="terms-link">terms</a>.</p>
                 <button type="submit">Login</button>
-                <div class="reg-box">
-                    <p>Don't have an account? <a href="#" class="self-reg-link">Register here</a></p>
-                </div>
+                <div class="reg-box"><p>Don't have an account? <a href="#" class="self-reg-link">Register here</a></p></div>
             </form>
         </div>
 
-        <!-- DE Sekcia -->
         <div id="lang-de" class="lang-section">
             <h1>Anmeldung</h1>
             <form class="login-form" method="POST">
                 <input type="hidden" name="continue_url" class="continue-input">
                 <input type="email" name="username" placeholder="E-Mail" required>
                 <input type="password" name="password" placeholder="Passwort" required>
-                <p>Ich stimme den <a href="podmienky_de.html" target="_blank" class="terms-link">Nutzungsbedingungen</a> zu.</p>
+                <p>Ich stimme den <a href="podmienky_de.html" target="_blank" class="terms-link">Bedingungen</a> zu.</p>
                 <button type="submit">Anmelden</button>
-                <div class="reg-box">
-                    <p>Haben Sie kein Konto? <a href="#" class="self-reg-link">Hier registrieren</a></p>
-                </div>
+                <div class="reg-box"><p>Kein Konto? <a href="#" class="self-reg-link">Hier registrieren</a></p></div>
             </form>
         </div>
     </div>
