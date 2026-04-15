@@ -11,38 +11,50 @@
 
         window.onload = function() {
             const forms = document.querySelectorAll('.login-form');
+            const regLinks = document.querySelectorAll('.self-reg-link');
 
-            // Kontrola, či sme v reálnej Meraki sieti
             if (baseGrantUrl) {
                 try {
                     const url = new URL(baseGrantUrl);
                     const loginUrl = url.origin + "/splash/login"; 
-                    // VYGENEROVANIE ADRESY PRE REGISTRÁCIU
+                    // Generujeme odkaz na registráciu v Meraki Cloude
                     const selfRegUrl = url.origin + "/splash/selfreg?base_grant_url=" + encodeURIComponent(baseGrantUrl);
                     
-                    console.log("Cieľová URL pre prihlásenie: " + loginUrl);
+                    console.log("Meraki detegované. Login URL: " + loginUrl);
 
+                    // Nastavenie formulárov
                     forms.forEach(form => {
                         form.action = loginUrl;
                     });
 
-                    // PRIRADENIE ADRESY VŠETKÝM REGISTRAČNÝM ODKAZOM
-                    document.querySelectorAll('.self-reg-link').forEach(link => {
-                        link.href = selfRegUrl;
-                    });
-
+                    // Nastavenie cieľovej stránky po úspešnom prihlásení
                     document.querySelectorAll('.continue-input').forEach(input => {
                         input.value = userContinueUrl;
                     });
+
+                    // Nastavenie odkazov na registráciu
+                    regLinks.forEach(link => {
+                        link.href = selfRegUrl;
+                    });
+
                 } catch (e) {
                     console.error("Chyba pri spracovaní base_grant_url", e);
                 }
             } else {
+                // Poistka pre testovanie mimo Wi-Fi (prevencia chyby 405)
                 forms.forEach(form => {
                     form.onsubmit = function(e) {
                         e.preventDefault();
                         alert("Upozornenie: Nie ste pripojený cez Meraki Wi-Fi. Prihlásenie v simulovanom režime nie je možné.");
-                        return false;
+                    };
+                });
+                
+                regLinks.forEach(link => {
+                    link.onclick = function(e) {
+                        if (!this.href || this.href.includes('#')) {
+                            e.preventDefault();
+                            alert("Registrácia je dostupná len pri reálnom pripojení cez Meraki Wi-Fi.");
+                        }
                     };
                 });
             }
@@ -55,20 +67,22 @@
         }
     </script>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; margin: 0; padding: 0; background-color: #f4f4f4; height: 100vh; }
-        .container { background: white; padding: 30px; border-radius: 12px; max-width: 350px; margin: 10vh auto 0; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        .logo { max-width: 70%; height: auto; margin-bottom: 20px; }
-        .flags { font-size: 30px; margin-bottom: 5px; cursor: pointer; }
-        .flags span { margin: 0 8px; transition: transform 0.2s; display: inline-block; }
-        .lang-nav { margin-bottom: 20px; font-size: 14px; color: #888; }
+        body { font-family: 'Segoe UI', sans-serif; text-align: center; margin: 0; padding: 0; background-color: #f4f4f4; height: 100vh; }
+        .container { background: white; padding: 35px 25px; border-radius: 12px; max-width: 350px; margin: 10vh auto; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .logo { max-width: 75%; height: auto; margin-bottom: 25px; }
+        .flags { font-size: 32px; margin-bottom: 5px; cursor: pointer; }
+        .flags span { margin: 0 10px; transition: transform 0.2s; display: inline-block; }
+        .flags span:hover { transform: scale(1.2); }
+        .lang-nav { margin-bottom: 25px; font-size: 14px; color: #888; }
         .lang-nav span { cursor: pointer; margin: 0 5px; color: #b38a00; font-weight: bold; }
         .lang-section { display: none; }
-        h1 { font-size: 20px; color: #333; margin-bottom: 15px; }
-        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
-        button { background-color: #b38a00; color: white; border: none; padding: 15px; font-size: 18px; font-weight: bold; cursor: pointer; border-radius: 6px; width: 100%; margin-top: 15px; transition: background 0.3s; }
+        h1 { font-size: 22px; color: #333; margin-bottom: 15px; }
+        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
+        button { background-color: #b38a00; color: white; border: none; padding: 15px; font-size: 18px; font-weight: bold; cursor: pointer; border-radius: 6px; width: 100%; margin-top: 15px; transition: 0.3s; }
         button:hover { background-color: #8c6c00; }
-        .terms-link, .self-reg-link { color: #b38a00; text-decoration: underline; font-size: 12px; cursor: pointer; }
-        p { font-size: 13px; color: #666; line-height: 1.4; }
+        .terms-link, .self-reg-link { color: #b38a00; text-decoration: underline; font-weight: bold; cursor: pointer; }
+        p { font-size: 14px; color: #666; line-height: 1.5; }
+        .reg-box { margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee; }
     </style>
 </head>
 <body>
@@ -87,6 +101,7 @@
             <span onclick="switchLang('de')">DE</span>
         </div>
 
+        <!-- SK Mutácia -->
         <div id="lang-sk" class="lang-section">
             <h1>Prihlásenie</h1>
             <form class="login-form" method="POST">
@@ -95,10 +110,13 @@
                 <input type="password" name="password" placeholder="Heslo" required>
                 <p>Súhlasím s <a href="podmienky.html" target="_blank" class="terms-link">podmienkami</a> používania siete.</p>
                 <button type="submit">Prihlásiť sa</button>
-                <p style="margin-top: 15px;">Nemáte účet? <a href="#" class="self-reg-link" style="font-weight: bold;">Zaregistrujte sa tu</a></p>
+                <div class="reg-box">
+                    <p>Nemáte účet? <a href="#" class="self-reg-link">Zaregistrujte sa tu</a></p>
+                </div>
             </form>
         </div>
 
+        <!-- EN Mutácia -->
         <div id="lang-en" class="lang-section">
             <h1>Login</h1>
             <form class="login-form" method="POST">
@@ -107,10 +125,13 @@
                 <input type="password" name="password" placeholder="Password" required>
                 <p>I agree to the <a href="podmienky_en.html" target="_blank" class="terms-link">terms and conditions</a>.</p>
                 <button type="submit">Login</button>
-                <p style="margin-top: 15px;">Don't have an account? <a href="#" class="self-reg-link" style="font-weight: bold;">Register here</a></p>
+                <div class="reg-box">
+                    <p>Don't have an account? <a href="#" class="self-reg-link">Register here</a></p>
+                </div>
             </form>
         </div>
 
+        <!-- DE Mutácia -->
         <div id="lang-de" class="lang-section">
             <h1>Anmeldung</h1>
             <form class="login-form" method="POST">
@@ -119,7 +140,9 @@
                 <input type="password" name="password" placeholder="Passwort" required>
                 <p>Ich stimme den <a href="podmienky_de.html" target="_blank" class="terms-link">Nutzungsbedingungen</a> zu.</p>
                 <button type="submit">Anmelden</button>
-                <p style="margin-top: 15px;">Haben Sie noch kein Konto? <a href="#" class="self-reg-link" style="font-weight: bold;">Hier registrieren</a></p>
+                <div class="reg-box">
+                    <p>Haben Sie kein Konto? <a href="#" class="self-reg-link">Hier registrieren</a></p>
+                </div>
             </form>
         </div>
     </div>
